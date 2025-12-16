@@ -8,6 +8,7 @@ interface Settings {
   name: string;
   company: string;
   notifications_email: boolean;
+    notification_recipients?: string[]; // E-mails para receber notificações
   notifications_push: boolean;
   notifications_sms: boolean;
   language: 'pt-BR' | 'en';
