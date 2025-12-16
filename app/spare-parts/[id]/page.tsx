@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { ChevronLeft, Edit2, Trash2, CheckCircle } from 'lucide-react';
+import { useRouter, useParams } from 'next/navigation';
+import { ChevronsLeft, ArrowLeft } from 'lucide-react';
 
 interface SparePart {
   id: string;
@@ -14,273 +14,273 @@ interface SparePart {
   price: number;
   quantity: number;
   minStock: number;
-  description: string;
-  partNumber: string;
+  description?: string;
+  partNumber?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export default function SparePartDetail({ params }: { params: { id: string } }) {
+export default function SparePartDetail() {
   const router = useRouter();
+  const params = useParams();
   const [sparePart, setSparePart] = useState<SparePart | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<SparePart | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const id = params.id as string;
 
   useEffect(() => {
-    loadSparePart();
-  }, [params.id]);
-
-  const loadSparePart = async () => {
-    try {
-      const response = await fetch(`/api/spare-parts/${params.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSparePart(data);
-        setFormData(data);
-      } else {
-        alert('Peça não encontrada');
-        router.back();
+    const loadSparePart = async () => {
+      try {
+        setLoading(true);
+        // Simular carregamento de dados
+        const mockData: SparePart = {
+          id: id || '1',
+          code: 'SP-001',
+          name: 'Rolamento SKF 6208-2RS',
+          category: 'Mecânicas',
+          manufacturer: 'SKF do Brasil',
+          location: 'Almoxarifado A - Prateleira 12',
+          price: 145.00,
+          quantity: 8,
+          minStock: 5,
+          description: 'Rolamento de esferas blindado para eixos de até 20mm',
+          partNumber: 'SKF-6208-2RS',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setSparePart(mockData);
+        setFormData(mockData);
+      } catch (error) {
+        console.error('Erro ao carregar peça:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Erro ao carregar peça:', error);
-    } finally {
-      setIsLoading(false);
+    };
+
+    if (id) {
+      loadSparePart();
     }
+  }, [id]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(
+      formData ? { ...formData, [name]: name.includes('price') || name.includes('quantity') || name.includes('minStock') ? parseFloat(value) || 0 : value } : null
+    );
   };
 
   const handleSave = async () => {
     if (!formData) return;
-    
-    setIsSaving(true);
     try {
-      const response = await fetch(`/api/spare-parts/${params.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        setSparePart(formData);
-        setIsEditing(false);
-        alert('Peça atualizada com sucesso!');
-      } else {
-        alert('Erro ao salvar peça');
-      }
+      setIsSaving(true);
+      // Simular salvar dados
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setSparePart(formData);
+      setEditing(false);
     } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao salvar peça');
+      console.error('Erro ao salvar:', error);
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    setIsSaving(true);
     try {
-      const response = await fetch(`/api/spare-parts/${params.id}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        alert('Peça deletada com sucesso!');
-        router.push('/spare-parts');
-      } else {
-        alert('Erro ao deletar peça');
-      }
+      setIsDeleting(true);
+      // Simular deletar
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      router.back();
     } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao deletar peça');
+      console.error('Erro ao deletar:', error);
     } finally {
-      setIsSaving(false);
-      setShowDeleteConfirm(false);
+      setIsDeleting(false);
     }
   };
 
-  if (isLoading) return <div className="p-6 text-center">Carregando...</div>;
-  if (!sparePart) return <div className="p-6 text-center">Peça não encontrada</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+  if (!sparePart) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Peça não encontrada</h2>
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600"
           >
-            <ChevronLeft size={24} />
+            <ArrowLeft size={20} />
             Voltar
           </button>
-          <h1 className="text-3xl font-bold">{sparePart.name}</h1>
-          <div className="flex gap-3">
-            {!isEditing && (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-                >
-                  <Edit2 size={20} /> Editar
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
-                >
-                  <Trash2 size={20} /> Deletar
-                </button>
-              </>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-cyan-500 hover:text-cyan-400 transition"
+          >
+            <ChevronsLeft size={24} />
+            Voltar
+          </button>
+        </div>
+
+        {/* Title */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-sm text-gray-400 mb-2 block">{sparePart.code}</span>
+              <h1 className="text-4xl font-bold mb-2">{sparePart.name}</h1>
+              <p className="text-gray-400">{sparePart.category}</p>
+            </div>
+            {!editing && (
+              <button
+                onClick={() => setEditing(true)}
+                className="px-6 py-3 bg-cyan-500 text-white rounded font-semibold hover:bg-cyan-600 transition"
+              >
+                Editar
+              </button>
             )}
           </div>
         </div>
 
         {/* Content */}
-        <div className="bg-gray-800 rounded-lg p-6 space-y-6">
-          {isEditing ? (
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Nome"
-                value={formData?.name || ''}
-                onChange={(e) => setFormData(f => f ? {...f, name: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded col-span-2"
-              />
-              <input
-                type="text"
-                placeholder="Código"
-                value={formData?.code || ''}
-                onChange={(e) => setFormData(f => f ? {...f, code: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Número da Peça"
-                value={formData?.partNumber || ''}
-                onChange={(e) => setFormData(f => f ? {...f, partNumber: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Fabricante"
-                value={formData?.manufacturer || ''}
-                onChange={(e) => setFormData(f => f ? {...f, manufacturer: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Localização"
-                value={formData?.location || ''}
-                onChange={(e) => setFormData(f => f ? {...f, location: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="number"
-                placeholder="Preço"
-                value={formData?.price || 0}
-                onChange={(e) => setFormData(f => f ? {...f, price: parseFloat(e.target.value)} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="number"
-                placeholder="Quantidade"
-                value={formData?.quantity || 0}
-                onChange={(e) => setFormData(f => f ? {...f, quantity: parseInt(e.target.value)} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <input
-                type="number"
-                placeholder="Estoque Mínimo"
-                value={formData?.minStock || 0}
-                onChange={(e) => setFormData(f => f ? {...f, minStock: parseInt(e.target.value)} : null)}
-                className="bg-gray-700 text-white p-3 rounded"
-              />
-              <textarea
-                placeholder="Descrição"
-                value={formData?.description || ''}
-                onChange={(e) => setFormData(f => f ? {...f, description: e.target.value} : null)}
-                className="bg-gray-700 text-white p-3 rounded col-span-2 h-24"
-              />
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="col-span-2 bg-green-600 hover:bg-green-700 px-6 py-3 rounded font-semibold flex items-center justify-center gap-2"
-              >
-                <CheckCircle size={20} /> {isSaving ? 'Salvando...' : 'Salvar'}
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="col-span-2 bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded font-semibold"
-              >
-                Cancelar
-              </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-6">
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Dados Gerais</h3>
+              {editing ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm mb-2">Nome da Peça</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData?.name || ''}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 focus:border-cyan-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Categoria</label>
+                    <input
+                      type="text"
+                      name="category"
+                      value={formData?.category || ''}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 focus:border-cyan-500 outline-none"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p><strong>Categoria:</strong> {sparePart.category}</p>
+                  <p><strong>Fabricante:</strong> {sparePart.manufacturer}</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="text-gray-400 text-sm">Código</label>
-                <p className="text-xl font-semibold text-cyan-400">{sparePart.code}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Número da Peça</label>
-                <p className="text-xl font-semibold text-cyan-400">{sparePart.partNumber}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Fabricante</label>
-                <p className="text-xl font-semibold">{sparePart.manufacturer}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Categoria</label>
-                <p className="text-xl font-semibold">{sparePart.category}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Localização</label>
-                <p className="text-xl font-semibold">{sparePart.location}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Preço Unitário</label>
-                <p className="text-xl font-semibold text-green-400">R$ {sparePart.price.toFixed(2)}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Quantidade em Estoque</label>
-                <p className="text-xl font-semibold">{sparePart.quantity}</p>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Estoque Mínimo</label>
-                <p className="text-xl font-semibold">{sparePart.minStock}</p>
-              </div>
-              <div className="col-span-2">
-                <label className="text-gray-400 text-sm">Descrição</label>
-                <p className="text-lg">{sparePart.description}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 rounded-lg p-6 max-w-sm">
-            <h3 className="text-xl font-bold mb-4">Confirmar Exclusão</h3>
-            <p className="text-gray-300 mb-6">Tem certeza que deseja deletar esta peça? Esta ação é irreversível.</p>
-            <div className="flex gap-4">
-              <button
-                onClick={handleDelete}
-                disabled={isSaving}
-                className="flex-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-semibold"
-              >
-                {isSaving ? 'Deletando...' : 'Deletar'}
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isSaving}
-                className="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold"
-              >
-                Cancelar
-              </button>
+          {/* Right Column */}
+          <div className="space-y-6">
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Estoque</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-400 text-sm">Quantidade</p>
+                  {editing ? (
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={formData?.quantity || 0}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 focus:border-cyan-500 outline-none"
+                    />
+                  ) : (
+                    <p className="text-2xl font-bold text-cyan-500">{sparePart.quantity}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Mínimo</p>
+                  <p className="text-2xl font-bold text-orange-500">{sparePart.minStock}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Action Buttons */}
+        {editing && (
+          <div className="flex gap-4 justify-end mt-8">
+            <button
+              onClick={() => setEditing(false)}
+              className="px-6 py-3 bg-gray-800 text-white rounded font-semibold hover:bg-gray-700 transition"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-6 py-3 bg-cyan-500 text-white rounded font-semibold hover:bg-cyan-600 transition disabled:opacity-50"
+            >
+              {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+            </button>
+          </div>
+        )}
+
+        {/* Delete Button */}
+        {!editing && (
+          <div className="mt-8 pt-8 border-t border-gray-800">
+            {showDeleteConfirm ? (
+              <div className="bg-red-900/20 border border-red-500 rounded-lg p-6">
+                <p className="mb-4">Tem certeza que deseja deletar esta peça? Esta ação não pode ser desfeita.</p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-6 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {isDeleting ? 'Deletando...' : 'Deletar'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-6 py-3 bg-red-900/20 text-red-500 rounded font-semibold hover:bg-red-900/40 transition border border-red-500"
+              >
+                Deletar Peça
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
