@@ -1,6 +1,3 @@
-'use client';
-
-import { useParams } from 'next/navigation';
 
 const sparePartsData = {
   'SP-001': {
@@ -26,8 +23,7 @@ export async function generateStaticParams() {
 }
 
 export default function SparePartPage() {
-  const params = useParams();
-  const id = params?.id as string;
+const { id } = params;  const id = params?.id as string;
   const sparePart = sparePartsData[id as keyof typeof sparePartsData];
 
   if (!sparePart) {
