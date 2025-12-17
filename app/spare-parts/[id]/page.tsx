@@ -22,7 +22,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function SparePartPage() {
+export default function SparePartPage({ params }) {
 const { id } = params;  const id = params?.id as string;
   const sparePart = sparePartsData[id as keyof typeof sparePartsData];
 
