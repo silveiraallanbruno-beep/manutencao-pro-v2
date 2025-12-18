@@ -1,3 +1,4 @@
+// Fixed build command to use npm
 
 const sparePartsData = {
   'SP-001': {
