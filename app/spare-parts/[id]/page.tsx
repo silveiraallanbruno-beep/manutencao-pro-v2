@@ -1,4 +1,3 @@
-// Auto-deployed via Vercel webhook
 
 const sparePartsData = {
   'SP-001': {
