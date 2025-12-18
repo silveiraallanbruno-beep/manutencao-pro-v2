@@ -1,8 +1,8 @@
 // app/api/tasks/route.ts - FASE 2
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+// import { NextRequest, NextResponse } from 'next/server'
+// import { supabase } from '@/lib/supabase'
+// import { getServerSession } from 'next-auth'
+// import { authOptions } from '@/lib/auth'
 
 export interface Task {
   id: string
