@@ -23,8 +23,7 @@ export async function generateStaticParams() {
 }
 
 export default function SparePartPage({ params }) {
-const { id } = params;  const id = params?.id as string;
-  const sparePart = sparePartsData[id as keyof typeof sparePartsData];
+  const { id } = params;  const sparePart = sparePartsData[id as keyof typeof sparePartsData];
 
   if (!sparePart) {
     return (
