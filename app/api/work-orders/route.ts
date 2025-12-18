@@ -1,9 +1,9 @@
 // app/api/work-orders/route.ts - FASE 2
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { MaintenanceOrder } from '@/lib/supabase'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+// import { NextRequest, NextResponse } from 'next/server'
+// import { supabase } from '@/lib/supabase'
+// import { MaintenanceOrder } from '@/lib/supabase'
+// import { getServerSession } from 'next-auth'
+// import { authOptions } from '@/lib/auth'
 
 // GET com join para equipment
 export async function GET(request: NextRequest) {
