@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+// import { NextRequest, NextResponse } from 'next/server';
 
 // GET - Retornar peça por ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+// export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Aqui conectar com Supabase
     // const { data, error } = await supabase
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       partNumber: 'SKF-6208-2RS'
     };
 
-    return NextResponse.json(mockData);
+//     return NextResponse.json(mockData);
   } catch (error) {
     console.error('Erro:', error);
     return NextResponse.json({ error: 'Erro ao carregar peça' }, { status: 500 });
@@ -46,15 +46,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     // Se houver erro, retornar
     // if (error) throw error;
 
-    return NextResponse.json({ success: true, data: body });
+//     return NextResponse.json({ success: true, data: body });
   } catch (error) {
     console.error('Erro ao atualizar:', error);
-    return NextResponse.json({ error: 'Erro ao atualizar peça' }, { status: 500 });
+//     return NextResponse.json({ error: 'Erro ao atualizar peça' }, { status: 500 });
   }
 }
 
 // DELETE - Deletar peça
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+// export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Aqui conectar com Supabase
     // const { error } = await supabase
@@ -65,10 +65,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     // Se houver erro, retornar
     // if (error) throw error;
 
-    return NextResponse.json({ success: true, message: 'Peça deletada com sucesso' });
+//     return NextResponse.json({ success: true, message: 'Peça deletada com sucesso' });
   } catch (error) {
     console.error('Erro ao deletar:', error);
-    return NextResponse.json({ error: 'Erro ao deletar peça' }, { status: 500 });
+//     return NextResponse.json({ error: 'Erro ao deletar peça' }, { status: 500 });
   }
 }
 
